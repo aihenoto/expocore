@@ -1,0 +1,20 @@
+name: Mirror su epocalisse
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  delete:
+  workflow_dispatch:
+jobs:
+  mirror:
+    if: github.repository_owner == 'aihenoto'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copia su epocalisse
+        env:
+          DEST_TOKEN: ${{ secrets.EPOCALISSE_TOKEN }}
+          SRC_TOKEN: ${{ github.token }}
+        run: |
+          git clone --mirror "https://x-access-token:${SRC_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" src
+          cd src
+          git push --force --prune "https://x-access-token:${DEST_TOKEN}@github.com/epocalisse/${GITHUB_REPOSITORY#*/}.git" "refs/heads/*:refs/heads/*" "refs/tags/*:refs/tags/*"
